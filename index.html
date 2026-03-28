@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="课外课记录">
+<title>课外课记录</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #e8e4da;
+  --text: #1a1915;
+  --text2: #6b6760;
+  --text3: #a09d97;
+  --piano: #2563a8;
+  --piano-bg: #deeaf8;
+  --chess: #6d4fc4;
+  --chess-bg: #ede9fb;
+  --math: #2e7d32;
+  --math-bg: #dff0df;
+  --swim: #0e7c61;
+  --swim-bg: #d6f0e8;
+  --done-bg: #dff0df;
+  --done-text: #1b5e20;
+  --leave-bg: #fff3cd;
+  --leave-text: #7a5000;
+  --soon-bg: #f0ede6;
+  --soon-text: #6b6760;
+  --red: #c62828;
+  --red-bg: #fde8e8;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+  position: sticky; top: 0; z-index: 50;
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.app-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+.month-nav { display: flex; align-items: center; gap: 10px; }
+.nav-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+  color: var(--text2);
+}
+.nav-btn:active { background: var(--surface2); }
+.month-label { font-size: 14px; font-weight: 500; min-width: 72px; text-align: center; }
+
+/* Subject tabs */
+.subject-tabs {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.subject-tabs::-webkit-scrollbar { display: none; }
+.stab {
+  padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; white-space: nowrap; color: var(--text2);
+  transition: all 0.15s;
+}
+.stab.on { border-color: transparent; color: #fff; }
+.stab.on.all { background: var(--text); }
+.stab.on.piano { background: var(--piano); }
+.stab.on.chess { background: var(--chess); }
+.stab.on.math { background: var(--math); }
+.stab.on.swim { background: var(--swim); }
+
+/* Main content */
+.main { padding: 14px 16px; max-width: 680px; margin: 0 auto; }
+
+/* Quota strip */
+.quota-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.qcard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 10px 8px;
+  cursor: pointer; transition: border-color 0.15s;
+}
+.qcard:active { border-color: var(--text3); }
+.qcard-sub { font-size: 10px; font-weight: 500; margin-bottom: 5px; }
+.qcard-sub.piano { color: var(--piano); }
+.qcard-sub.chess { color: var(--chess); }
+.qcard-sub.math  { color: var(--math); }
+.qcard-sub.swim  { color: var(--swim); }
+.qcard-num { font-size: 22px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+.qcard-num.piano { color: var(--piano); }
+.qcard-num.chess { color: var(--chess); }
+.qcard-num.math  { color: var(--math); }
+.qcard-num.swim  { color: var(--swim); }
+.qcard-num.warn  { color: var(--red) !important; }
+.qbar-bg { height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; margin-bottom: 4px; }
+.qbar-fill { height: 100%; border-radius: 2px; }
+.qcard-detail { font-size: 10px; color: var(--text3); }
+
+/* Stats row */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.scard { background: var(--surface); border-radius: var(--radius-sm); padding: 10px 12px; border: 1px solid var(--border); }
+.scard-label { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+.scard-num { font-size: 22px; font-weight: 700; }
+
+/* Records list */
+.records-list { display: flex; flex-direction: column; gap: 8px; }
+.rec-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.rec-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rec-dot.piano { background: var(--piano); }
+.rec-dot.chess  { background: var(--chess); }
+.rec-dot.math   { background: var(--math); }
+.rec-dot.swim   { background: var(--swim); }
+.rec-main { flex: 1; min-width: 0; }
+.rec-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.rec-sub { font-size: 14px; font-weight: 500; }
+.rec-date { font-size: 12px; color: var(--text3); }
+.rec-note { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 500; flex-shrink: 0;
+}
+.badge.done  { background: var(--done-bg);  color: var(--done-text); }
+.badge.leave { background: var(--leave-bg); color: var(--leave-text); }
+.badge.soon  { background: var(--soon-bg);  color: var(--soon-text); }
+.rec-del {
+  background: none; border: none; color: var(--text3); cursor: pointer;
+  font-size: 16px; padding: 4px; border-radius: 6px; flex-shrink: 0;
+  line-height: 1;
+}
+.rec-del:active { background: var(--red-bg); color: var(--red); }
+.empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 13px; }
+.loading { text-align: center; padding: 2rem; color: var(--text3); font-size: 13px; }
+
+/* FAB */
+.fab {
+  position: fixed; bottom: 24px; right: 20px;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--text); color: #fff;
+  font-size: 26px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  z-index: 40;
+}
+.fab:active { transform: scale(0.95); }
+
+/* Modal */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 100;
+  align-items: flex-end; justify-content: center;
+}
+.overlay.show { display: flex; }
+.sheet {
+  background: var(--surface); width: 100%; max-width: 480px;
+  border-radius: 20px 20px 0 0; padding: 20px 20px 32px;
+  animation: slideUp 0.2s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.sheet-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.form-row { margin-bottom: 14px; }
+.form-row label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 5px; }
+.form-row input, .form-row select {
+  width: 100%; padding: 10px 12px; font-size: 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text);
+  font-family: inherit; outline: none;
+}
+.form-row input:focus, .form-row select:focus { border-color: var(--text3); }
+.sheet-actions { display: flex; gap: 10px; margin-top: 18px; }
+.btn-cancel {
+  flex: 1; padding: 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface2);
+  font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text2);
+  font-family: inherit;
+}
+.btn-save {
+  flex: 2; padding: 12px; border: none;
+  border-radius: var(--radius-sm); background: var(--text);
+  font-size: 14px; font-weight: 500; cursor: pointer; color: #fff;
+  font-family: inherit;
+}
+.btn-save:active { opacity: 0.85; }
+.btn-cancel:active { background: var(--border); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: rgba(26,25,21,0.88); color: #fff;
+  padding: 9px 20px; border-radius: 20px; font-size: 13px;
+  z-index: 200; opacity: 0; transition: opacity 0.2s; white-space: nowrap;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="app-title">课外课记录</div>
+    <div class="month-nav">
+      <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+      <div class="month-label" id="monthLabel"></div>
+      <button class="nav-btn" onclick="changeMonth(1)">▶</button>
+    </div>
+  </div>
+  <div class="subject-tabs">
+    <button class="stab on all" onclick="setFilter('all',this)">全部</button>
+    <button class="stab piano" onclick="setFilter('钢琴',this)">🎹 钢琴</button>
+    <button class="stab chess" onclick="setFilter('国际象棋',this)">♟ 象棋</button>
+    <button class="stab math"  onclick="setFilter('数学',this)">📐 数学</button>
+    <button class="stab swim"  onclick="setFilter('游泳',this)">🏊 游泳</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="quota-grid" id="quotaGrid"></div>
+  <div class="stats-row">
+    <div class="scard"><div class="scard-label">本月上课</div><div class="scard-num" id="sDone" style="color:var(--math)">–</div></div>
+    <div class="scard"><div class="scard-label">请假</div><div class="scard-num" id="sLeave" style="color:var(--leave-text)">–</div></div>
+    <div class="scard"><div class="scard-label">待上课</div><div class="scard-num" id="sSoon" style="color:var(--text3)">–</div></div>
+  </div>
+  <div id="recList"><div class="loading">加载中...</div></div>
+</div>
+
+<button class="fab" onclick="openAdd()">＋</button>
+
+<!-- Add record sheet -->
+<div class="overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">添加上课记录</div>
+    <div class="form-row"><label>日期</label><input type="date" id="fDate"></div>
+    <div class="form-row"><label>科目</label>
+      <select id="fSub">
+        <option value="钢琴">🎹 钢琴</option>
+        <option value="国际象棋">♟ 国际象棋</option>
+        <option value="数学">📐 数学</option>
+        <option value="游泳">🏊 游泳</option>
+      </select>
+    </div>
+    <div class="form-row"><label>状态</label>
+      <select id="fStatus">
+        <option value="已完成">已完成</option>
+        <option value="请假">请假</option>
+        <option value="待上课">待上课</option>
+      </select>
+    </div>
+    <div class="form-row"><label>备注（可选）</label>
+      <input type="text" id="fNote" placeholder="如：手型练习、换气练习…">
+    </div>
+    <div class="sheet-actions">
+      <button class="btn-cancel" onclick="closeAdd()">取消</button>
+      <button class="btn-save" onclick="saveAdd()" id="saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quota edit sheet -->
+<div class="overlay" id="quotaOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="quotaTitle">修改课时包</div>
+    <div class="form-row"><label>课时包总课时数</label><input type="number" id="qTotal" min="1" max="999" step="1"></div>
+    <div class="form-row"><label>手动调整已用课时（一般不需要改）</label><input type="number" id="qExtra" min="0" step="1"></div>
+    <div class="sheet-actions">
+      <button class="btn-cancel" onclick="closeQuota()">取消</button>
+      <button class="btn-save" onclick="saveQuota()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbxeO55loC7K9aBIUz1rYhuXeoMHiDSIDwEufPx77362l7ITCAu1kTxPq0ke6IKOrN42NQ/exec';
+const SUBJECTS = ['钢琴','国际象棋','数学','游泳'];
+const CLS = {钢琴:'piano',国际象棋:'chess',数学:'math',游泳:'swim'};
+const DAYS = ['周日','周一','周二','周三','周四','周五','周六'];
+const MNAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+let allRecords = [];
+let quotas = JSON.parse(localStorage.getItem('quotas') || '{"钢琴":{"total":20,"extra":0},"国际象棋":{"total":24,"extra":0},"数学":{"total":16,"extra":0},"游泳":{"total":20,"extra":0}}');
+let cy = new Date().getFullYear(), cm = new Date().getMonth()+1;
+let filter = 'all', editSub = null;
+
+// Use no-cors mode with redirect following — Apps Script requires this pattern
+function api(params) {
+  const url = API + '?' + new URLSearchParams(params);
+  return fetch(url, {
+    method: 'GET',
+    redirect: 'follow',
+    mode: 'cors',
+  }).then(r => r.json());
+}
+
+// Fallback: JSONP for environments that block cors fetch to Apps Script
+function apiJsonp(params) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Date.now();
+    const url = API + '?' + new URLSearchParams({...params, callback: cb});
+    const s = document.createElement('script');
+    const timer = setTimeout(() => { reject(new Error('timeout')); s.remove(); delete window[cb]; }, 10000);
+    window[cb] = data => { clearTimeout(timer); resolve(data); s.remove(); delete window[cb]; };
+    s.onerror = () => { clearTimeout(timer); reject(new Error('script error')); delete window[cb]; };
+    s.src = url;
+    document.head.appendChild(s);
+  });
+}
+
+async function apiCall(params) {
+  try {
+    return await api(params);
+  } catch(e) {
+    return await apiJsonp(params);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function changeMonth(d) { cm += d; if(cm>12){cm=1;cy++;} if(cm<1){cm=12;cy--;} render(); }
+function setFilter(f, el) {
+  filter = f;
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  render();
+}
+
+function monthRecs() {
+  return allRecords.filter(r => {
+    const d = new Date(r.date);
+    return d.getFullYear()===cy && d.getMonth()+1===cm;
+  });
+}
+function usedAll(sub) { return allRecords.filter(r=>r.subject===sub&&r.status==='已完成').length; }
+function remain(sub) { return Math.max(0, quotas[sub].total - usedAll(sub) - (quotas[sub].extra||0)); }
+
+function renderQuotas() {
+  document.getElementById('quotaGrid').innerHTML = SUBJECTS.map(s => {
+    const t = quotas[s].total;
+    const used = usedAll(s) + (quotas[s].extra||0);
+    const r = Math.max(0, t - used);
+    const pct = t > 0 ? Math.min(100, Math.round(used/t*100)) : 0;
+    const warn = r <= 3;
+    const colors = {钢琴:'#2563a8',国际象棋:'#6d4fc4',数学:'#2e7d32',游泳:'#0e7c61'};
+    return `<div class="qcard" onclick="openQuota('${s}')">
+      <div class="qcard-sub ${CLS[s]}">${s}</div>
+      <div class="qcard-num ${CLS[s]}${warn?' warn':''}">${r}</div>
+      <div class="qbar-bg"><div class="qbar-fill" style="width:${pct}%;background:${colors[s]}"></div></div>
+      <div class="qcard-detail">剩余课时${warn?' ⚠':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function render() {
+  document.getElementById('monthLabel').textContent = cy+'年'+MNAMES[cm-1];
+  renderQuotas();
+  const mr = monthRecs();
+  document.getElementById('sDone').textContent = mr.filter(r=>r.status==='已完成').length;
+  document.getElementById('sLeave').textContent = mr.filter(r=>r.status==='请假').length;
+  document.getElementById('sSoon').textContent = mr.filter(r=>r.status==='待上课').length;
+
+  const shown = (filter==='all'?mr:mr.filter(r=>r.subject===filter))
+    .sort((a,b)=>b.date.localeCompare(a.date));
+
+  const list = document.getElementById('recList');
+  if (!shown.length) { list.innerHTML='<div class="empty">本月暂无记录</div>'; return; }
+
+  const statusCls = {'已完成':'done','请假':'leave','待上课':'soon'};
+  list.innerHTML = '<div class="records-list">' + shown.map(r => {
+    const d = new Date(r.date);
+    const dateStr = (d.getMonth()+1)+'月'+d.getDate()+'日 '+DAYS[d.getDay()];
+    return `<div class="rec-card">
+      <div class="rec-dot ${CLS[r.subject]}"></div>
+      <div class="rec-main">
+        <div class="rec-top">
+          <span class="rec-sub">${r.subject}</span>
+          <span class="rec-date">${dateStr}</span>
+        </div>
+        <div class="rec-note">${r.note||'—'}</div>
+      </div>
+      <span class="badge ${statusCls[r.status]||'soon'}">${r.status}</span>
+      <button class="rec-del" onclick="delRec('${r.id}')">×</button>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+async function loadAll() {
+  document.getElementById('recList').innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const res = await apiCall({action:'getAll'});
+    allRecords = (res.records||[]).filter(r=>r.id&&r.date&&r.subject);
+    render();
+  } catch(e) {
+    document.getElementById('recList').innerHTML = '<div class="empty">加载失败 — 请确认 Apps Script 已重新部署，且「谁可以访问」设为「所有人」</div>';
+    console.error(e);
+  }
+}
+
+function openAdd() {
+  const today = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('fDate').value = `${cy}-${pad(cm)}-${pad(today.getDate())}`;
+  document.getElementById('fNote').value = '';
+  document.getElementById('addOverlay').classList.add('show');
+}
+function closeAdd() { document.getElementById('addOverlay').classList.remove('show'); }
+
+async function saveAdd() {
+  const date = document.getElementById('fDate').value;
+  if (!date) { showToast('请选择日期'); return; }
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '保存中…'; btn.disabled = true;
+  try {
+    const res = await apiCall({
+      action:'add', date,
+      subject: document.getElementById('fSub').value,
+      status: document.getElementById('fStatus').value,
+      note: document.getElementById('fNote').value
+    });
+    if (res.ok) {
+      allRecords.push({id:String(res.id), date, subject:document.getElementById('fSub').value, status:document.getElementById('fStatus').value, note:document.getElementById('fNote').value});
+      closeAdd(); render(); showToast('已添加');
+    }
+  } catch(e) { showToast('保存失败，请重试'); }
+  btn.textContent = '保存'; btn.disabled = false;
+}
+
+async function delRec(id) {
+  if (!confirm('确认删除这条记录？')) return;
+  try {
+    await apiCall({action:'delete', id});
+    allRecords = allRecords.filter(r=>String(r.id)!==String(id));
+    render(); showToast('已删除');
+  } catch(e) { showToast('删除失败'); }
+}
+
+function openQuota(s) {
+  editSub = s;
+  document.getElementById('quotaTitle').textContent = '修改课时包 — ' + s;
+  document.getElementById('qTotal').value = quotas[s].total;
+  document.getElementById('qExtra').value = quotas[s].extra||0;
+  document.getElementById('quotaOverlay').classList.add('show');
+}
+function closeQuota() { document.getElementById('quotaOverlay').classList.remove('show'); editSub=null; }
+function saveQuota() {
+  if (!editSub) return;
+  quotas[editSub].total = parseInt(document.getElementById('qTotal').value)||0;
+  quotas[editSub].extra = parseInt(document.getElementById('qExtra').value)||0;
+  localStorage.setItem('quotas', JSON.stringify(quotas));
+  closeQuota(); renderQuotas(); showToast('已保存');
+}
+
+document.getElementById('addOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeAdd(); });
+document.getElementById('quotaOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeQuota(); });
+
+loadAll();
+</script>
+</body>
+</html>
