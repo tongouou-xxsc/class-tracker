@@ -708,38 +708,56 @@ function renderCalendar(){
   const today = new Date();
   const todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
   const recMap = {};
-  allRecords.forEach(r=>{ if(!recMap[r.date])recMap[r.date]={}; if(!recMap[r.date][r.subject])recMap[r.date][r.subject]=[]; recMap[r.date][r.subject].push(r); });
+  allRecords.forEach(r=>{ if(!recMap[r.date]) recMap[r.date]=[]; if(!recMap[r.date].includes(r.subject)) recMap[r.date].push(r.subject); });
   const col=name=>{const s=subjects.find(x=>x.name===name);return s?s.color:'#999';};
   const dowLabels=['日','一','二','三','四','五','六'];
-  const headers=dowLabels.map(d=>'<div class="cal-dow">'+d+'</div>').join('');
-  let cells='';
-  for(let i=0;i<startDow;i++) cells+='<div class="cal-cell other-month"></div>';
+  const calWrap=document.createElement('div'); calWrap.className='cal-wrap';
+  const grid=document.createElement('div'); grid.className='cal-grid';
+  dowLabels.forEach(d=>{const h=document.createElement('div');h.className='cal-dow';h.textContent=d;grid.appendChild(h);});
+  for(let i=0;i<startDow;i++){const b=document.createElement('div');b.className='cal-cell other-month';grid.appendChild(b);}
   for(let d=1;d<=totalDays;d++){
     const dateStr=cy+'-'+String(cm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const dayRecs=recMap[dateStr]||{};
+    const daySubs=recMap[dateStr]||[];
+    const filtered=filter==='all'?daySubs:daySubs.filter(s=>s===filter);
     const isToday=dateStr===todayStr;
-    const dotSubjects=filter==='all'?Object.keys(dayRecs):(dayRecs[filter]?[filter]:[]);
-    const dots=dotSubjects.slice(0,5).map(name=>'<div class="cal-dot" style="background:'+col(name)+'"></div>').join('');
-    cells+='<div class="cal-cell'+(isToday?' today':'')+'" onclick="openDayDetail(\''+dateStr+'\')"><div class="cal-day">'+d+'</div><div class="cal-dots">'+dots+'</div></div>';
+    const cell=document.createElement('div');
+    cell.className='cal-cell'+(isToday?' today':'');
+    cell.addEventListener('click',()=>openDayDetail(dateStr));
+    const dayNum=document.createElement('div'); dayNum.className='cal-day'; dayNum.textContent=d; cell.appendChild(dayNum);
+    const dotsWrap=document.createElement('div'); dotsWrap.className='cal-dots';
+    filtered.slice(0,5).forEach(name=>{const dot=document.createElement('div');dot.className='cal-dot';dot.style.background=col(name);dotsWrap.appendChild(dot);});
+    cell.appendChild(dotsWrap); grid.appendChild(cell);
   }
   const trailing=(startDow+totalDays)%7===0?0:7-(startDow+totalDays)%7;
-  for(let i=0;i<trailing;i++) cells+='<div class="cal-cell other-month"></div>';
-  calEl.innerHTML='<div class="cal-wrap"><div class="cal-grid">'+headers+cells+'</div></div>';
+  for(let i=0;i<trailing;i++){const b=document.createElement('div');b.className='cal-cell other-month';grid.appendChild(b);}
+  calWrap.appendChild(grid); calEl.innerHTML=''; calEl.appendChild(calWrap);
 }
 
 // ---- Day detail ----
 function openDayDetail(dateStr){
   selectedDayDate=dateStr;
-  const d=new Date(dateStr);
+  const d=new Date(dateStr+'T00:00:00');
   const label=(d.getMonth()+1)+'月'+d.getDate()+'日 '+DAYS_SHORT[d.getDay()];
   document.getElementById('dayTitle').textContent=label;
   const dayRecs=allRecords.filter(r=>r.date===dateStr);
   const col=name=>{const s=subjects.find(x=>x.name===name);return s?s.color:'#999';};
   const sc={'已完成':'done','请假':'leave','待上课':'soon'};
+  const recsEl=document.getElementById('dayRecs'); recsEl.innerHTML='';
   if(!dayRecs.length){
-    document.getElementById('dayRecs').innerHTML='<div style="padding:1rem 0;color:var(--text3);font-size:13px;text-align:center;">暂无记录，点下方按钮添加</div>';
+    const empty=document.createElement('div');
+    empty.style.cssText='padding:1rem 0;color:var(--text3);font-size:13px;text-align:center;';
+    empty.textContent='暂无记录，点下方按钮添加'; recsEl.appendChild(empty);
   } else {
-    document.getElementById('dayRecs').innerHTML=dayRecs.map(r=>`<div class="day-rec"><div class="day-rec-dot" style="background:${col(r.subject)}"></div><div class="day-rec-info"><div class="day-rec-sub">${r.subject}</div>${r.note?'<div class="day-rec-note">'+r.note+'</div>':''}</div><span class="badge ${sc[r.status]||'soon'}">${r.status}</span><button class="rec-del" onclick="delRecFromDay(\'${r.id}\',\'${dateStr}\')">×</button></div>`).join('');
+    dayRecs.forEach(r=>{
+      const row=document.createElement('div'); row.className='day-rec';
+      row.innerHTML='<div class="day-rec-dot" style="background:'+col(r.subject)+'"></div>'
+        +'<div class="day-rec-info"><div class="day-rec-sub">'+r.subject+'</div>'
+        +(r.note?'<div class="day-rec-note">'+r.note+'</div>':'')
+        +'</div><span class="badge '+(sc[r.status]||'soon')+'">'+r.status+'</span>';
+      const delBtn=document.createElement('button'); delBtn.className='rec-del'; delBtn.textContent='×';
+      delBtn.addEventListener('click',()=>delRecFromDay(r.id,dateStr));
+      row.appendChild(delBtn); recsEl.appendChild(row);
+    });
   }
   document.getElementById('dayOverlay').classList.add('show');
 }
