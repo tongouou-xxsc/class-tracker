@@ -342,11 +342,10 @@ const Q_KEY = 'quotas_' + USER;
 
 // schedule: [{day:1, time:'16:00'}, ...]  day: 0=Sun…6=Sat
 const DEFAULT_SUBJECTS = [
-  {name:'钢琴',    emoji:'🎹', color:'#2563a8', total:20, schedule:[]},
-  {name:'国际象棋', emoji:'♟',  color:'#6d4fc4', total:24, schedule:[]},
-  {name:'数学',    emoji:'📐', color:'#2e7d32', total:16, schedule:[]},
-  {name:'游泳',    emoji:'🏊', color:'#0e7c61', total:20, schedule:[]},
-  {name:'围棋',    emoji:'⚫', color:'#b05c1a', total:20, schedule:[]},
+  {name:'钢琴',   emoji:'🎹', color:'#2563a8', total:20, schedule:[]},
+  {name:'围棋',   emoji:'⚫', color:'#b05c1a', total:20, schedule:[]},
+  {name:'游泳周日', emoji:'🏊', color:'#0e7c61', total:20, schedule:[]},
+  {name:'游泳周六', emoji:'🏊', color:'#1565c0', total:20, schedule:[]},
 ];
 
 let subjects = JSON.parse(localStorage.getItem(S_KEY) || 'null') || DEFAULT_SUBJECTS;
