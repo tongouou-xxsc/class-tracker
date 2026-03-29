@@ -244,6 +244,10 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
       <div id="subjectList"></div>
       <button class="add-subject-btn" onclick="openAddSubject()">＋ 添加新科目</button>
     </div>
+    <div class="settings-section">
+      <div class="settings-section-title">数据管理</div>
+      <button class="add-subject-btn" style="color:var(--red);border-color:var(--red);" onclick="resetSubjects()">重置科目列表（恢复默认）</button>
+    </div>
   </div>
 </div>
 
@@ -799,6 +803,13 @@ async function delRecFromDay(id,dateStr){
 ['addOverlay','quotaOverlay','subjectOverlay','dayOverlay'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show');});
 });
+
+function resetSubjects(){
+  if(!confirm('确认重置科目列表？这会把科目恢复到默认的5个（钢琴、国际象棋、数学、游泳、围棋），课时记录不受影响。')) return;
+  localStorage.removeItem(S_KEY);
+  localStorage.removeItem(Q_KEY);
+  location.reload();
+}
 
 if(USER!=='default') document.getElementById('userTag').textContent='👤 '+USER;
 loadAll();
