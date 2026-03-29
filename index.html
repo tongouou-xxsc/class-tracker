@@ -9,7 +9,7 @@
 <title>课外课记录</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
+:root{
   --bg:#f7f6f2;--surface:#fff;--surface2:#f0ede6;--border:#e8e4da;
   --text:#1a1915;--text2:#6b6760;--text3:#a09d97;
   --done-bg:#dff0df;--done-text:#1b5e20;
@@ -21,16 +21,19 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
 
+/* Bottom nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:50;}
 .bnav-btn{flex:1;padding:10px 0 14px;border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit;}
 .bnav-btn.on{color:var(--text);}
 .bnav-icon{font-size:20px;}
 
+/* Pages */
 .page{display:none;padding-bottom:80px;}
 .page.on{display:block;}
 
+/* Header */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px 12px;position:sticky;top:0;z-index:40;}
-.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .app-title{font-size:17px;font-weight:700;letter-spacing:-0.3px;}
 .user-tag{font-size:11px;color:var(--text3);margin-top:2px;}
 .month-nav{display:flex;align-items:center;gap:10px;}
@@ -41,6 +44,14 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 .subject-tabs::-webkit-scrollbar{display:none;}
 .stab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface);cursor:pointer;white-space:nowrap;color:var(--text2);transition:all 0.15s;}
 
+/* Today banner */
+.today-banner{margin:12px 16px 0;border-radius:var(--radius-sm);padding:10px 14px;display:none;}
+.today-banner.show{display:block;}
+.today-banner-title{font-size:11px;font-weight:700;margin-bottom:6px;opacity:0.75;}
+.today-classes{display:flex;flex-wrap:wrap;gap:6px;}
+.today-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;color:#fff;border:none;}
+
+/* Main */
 .main{padding:14px 16px;max-width:680px;margin:0 auto;}
 .quota-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:14px;}
 .qcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 10px 8px;cursor:pointer;}
@@ -51,6 +62,24 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 .qbar-bg{height:3px;border-radius:2px;background:var(--border);overflow:hidden;margin-bottom:4px;}
 .qbar-fill{height:100%;border-radius:2px;}
 .qcard-detail{font-size:10px;color:var(--text3);}
+
+/* Per-subject stats */
+.stats-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;width:100%;}
+.stats-table-head{display:grid;grid-template-columns:1fr repeat(3,60px);padding:6px 12px;background:var(--surface2);font-size:11px;font-weight:700;color:var(--text3);}
+.stats-table-row{display:grid;grid-template-columns:1fr repeat(3,60px);padding:9px 12px;border-top:1px solid var(--border);align-items:center;}
+.stats-table-row:first-child{border-top:none;}
+.stats-sub{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;}
+.stats-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.stats-cell{text-align:center;font-size:13px;font-weight:500;}
+.stats-cell.done{color:#2e7d32;}
+.stats-cell.leave{color:#7a5000;}
+.stats-cell.soon{color:var(--text3);}
+.stats-total-row{display:grid;grid-template-columns:1fr repeat(3,60px);padding:8px 12px;border-top:1px solid var(--border);background:var(--surface2);}
+.stats-total-label{font-size:12px;font-weight:700;color:var(--text2);}
+.stats-total-cell{text-align:center;font-size:13px;font-weight:700;}
+.stats-total-cell.done{color:#2e7d32;}
+.stats-total-cell.leave{color:#7a5000;}
+.stats-total-cell.soon{color:var(--text3);}
 
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
 .scard{background:var(--surface);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border);}
@@ -74,15 +103,23 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 .empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px;}
 .loading{text-align:center;padding:2rem;color:var(--text3);font-size:13px;}
 
+/* FAB */
 .fab{position:fixed;bottom:72px;right:20px;width:54px;height:54px;border-radius:50%;background:var(--text);color:#fff;font-size:26px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.18);z-index:40;}
 .fab:active{transform:scale(0.95);}
+
+/* Subject picker (big buttons) */
+.sub-picker{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:4px;}
+.sub-pick-btn{padding:14px 10px;border-radius:var(--radius);border:2px solid transparent;cursor:pointer;font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;transition:opacity 0.1s;}
+.sub-pick-btn:active{opacity:0.8;}
+.sub-pick-btn.on{box-shadow:0 0 0 3px var(--text);}
 
 /* Settings */
 .settings-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px;position:sticky;top:0;z-index:40;font-size:17px;font-weight:700;}
 .settings-main{padding:16px;max-width:680px;margin:0 auto;}
 .settings-section{margin-bottom:24px;}
 .settings-section-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.8px;margin-bottom:10px;}
-.subject-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.subject-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;}
+.subject-item-top{display:flex;align-items:center;gap:12px;}
 .subject-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
 .subject-info{flex:1;}
 .subject-name{font-size:14px;font-weight:500;}
@@ -90,18 +127,31 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 .subject-actions{display:flex;gap:6px;}
 .icon-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;font-size:12px;color:var(--text2);font-family:inherit;}
 .icon-btn:active{background:var(--surface2);}
-.icon-btn.danger:active{background:var(--red-bg);color:var(--red);border-color:var(--red);}
+.icon-btn.danger:active{background:var(--red-bg);color:var(--red);}
+.schedule-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.schedule-pill{font-size:11px;padding:3px 10px;border-radius:10px;color:#fff;display:inline-block;}
 .add-subject-btn{width:100%;padding:12px;border:1px dashed var(--border);border-radius:var(--radius-sm);background:none;cursor:pointer;font-size:13px;color:var(--text3);font-family:inherit;}
 .add-subject-btn:active{background:var(--surface2);}
 
+/* Color picker */
 .color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
-.color-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:border-color 0.1s;}
+.color-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
 .color-dot.on{border-color:var(--text);}
 
-/* Overlays */
+/* Schedule picker inside edit sheet */
+.day-grid{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.day-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);font-family:inherit;}
+.day-btn.on{border-color:transparent;color:#fff;}
+.schedule-list{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.schedule-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+.schedule-row select{flex:1;padding:6px 8px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;outline:none;}
+.schedule-row .rm-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px 5px;}
+.add-sched-btn{margin-top:8px;padding:7px 14px;border:1px dashed var(--border);border-radius:var(--radius-sm);background:none;cursor:pointer;font-size:12px;color:var(--text3);font-family:inherit;width:100%;}
+
+/* Overlay / sheet */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-end;justify-content:center;}
 .overlay.show{display:flex;}
-.sheet{background:var(--surface);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 32px;animation:slideUp 0.2s ease;}
+.sheet{background:var(--surface);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 32px;animation:slideUp 0.2s ease;max-height:90vh;overflow-y:auto;}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
 .sheet-title{font-size:16px;font-weight:700;margin-bottom:16px;}
@@ -121,6 +171,7 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 </head>
 <body>
 
+<!-- ===== HOME ===== -->
 <div class="page on" id="page-home">
   <div class="header">
     <div class="header-top">
@@ -133,18 +184,22 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
     </div>
     <div class="subject-tabs" id="subjectTabs"></div>
   </div>
+
+  <!-- Today banner -->
+  <div class="today-banner" id="todayBanner">
+    <div class="today-banner-title">📅 今天的课</div>
+    <div class="today-classes" id="todayClasses"></div>
+  </div>
+
   <div class="main">
     <div class="quota-grid" id="quotaGrid"></div>
-    <div class="stats-row">
-      <div class="scard"><div class="scard-label">本月上课</div><div class="scard-num" id="sDone" style="color:#2e7d32">–</div></div>
-      <div class="scard"><div class="scard-label">请假</div><div class="scard-num" id="sLeave" style="color:#7a5000">–</div></div>
-      <div class="scard"><div class="scard-label">待上课</div><div class="scard-num" id="sSoon" style="color:var(--text3)">–</div></div>
-    </div>
+    <div id="statsBlock" style="margin-bottom:14px;"></div>
     <div id="recList"><div class="loading">加载中...</div></div>
   </div>
   <button class="fab" onclick="openAdd()">＋</button>
 </div>
 
+<!-- ===== SETTINGS ===== -->
 <div class="page" id="page-settings">
   <div class="settings-header">设置</div>
   <div class="settings-main">
@@ -161,17 +216,22 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
   <button class="bnav-btn" id="nav-settings" onclick="switchPage('settings')"><span class="bnav-icon">⚙️</span>设置</button>
 </nav>
 
-<!-- Add record -->
+<!-- ===== ADD RECORD SHEET ===== -->
 <div class="overlay" id="addOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">添加上课记录</div>
     <div class="form-row"><label>日期</label><input type="date" id="fDate"></div>
-    <div class="form-row"><label>科目</label><select id="fSub"></select></div>
+    <div class="form-row">
+      <label>选择科目</label>
+      <div class="sub-picker" id="subPicker"></div>
+    </div>
     <div class="form-row"><label>状态</label>
       <select id="fStatus"><option value="已完成">已完成</option><option value="请假">请假</option><option value="待上课">待上课</option></select>
     </div>
-    <div class="form-row"><label>备注（可选）</label><input type="text" id="fNote" placeholder="如：手型练习、换气练习…"></div>
+    <div class="form-row"><label>备注（可选）</label>
+      <input type="text" id="fNote" placeholder="如：手型练习、换气练习…">
+    </div>
     <div class="sheet-actions">
       <button class="btn-cancel" onclick="closeAdd()">取消</button>
       <button class="btn-save" onclick="saveAdd()" id="saveBtn">保存</button>
@@ -179,7 +239,7 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-<!-- Quota edit -->
+<!-- ===== QUOTA SHEET ===== -->
 <div class="overlay" id="quotaOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -193,7 +253,7 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-<!-- Add/edit subject -->
+<!-- ===== SUBJECT EDIT SHEET ===== -->
 <div class="overlay" id="subjectOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -202,6 +262,11 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
     <div class="form-row"><label>图标（emoji）</label><input type="text" id="sEmoji" placeholder="如：♟ 🎸 🧮" maxlength="4"></div>
     <div class="form-row"><label>颜色</label><div class="color-grid" id="colorGrid"></div></div>
     <div class="form-row"><label>课时包总数</label><input type="number" id="sTotal" min="1" max="999" step="1" value="20"></div>
+    <div class="form-row">
+      <label>固定上课时间（可选，用于今日提醒）</label>
+      <div id="scheduleList" class="schedule-list"></div>
+      <button class="add-sched-btn" onclick="addScheduleRow()">＋ 添加上课时间</button>
+    </div>
     <div class="sheet-actions">
       <button class="btn-cancel" onclick="closeSubject()">取消</button>
       <button class="btn-save" onclick="saveSubject()">保存</button>
@@ -213,42 +278,46 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbxeO55loC7K9aBIUz1rYhuXeoMHiDSIDwEufPx77362l7ITCAu1kTxPq0ke6IKOrN42NQ/exec';
-const DAYS = ['周日','周一','周二','周三','周四','周五','周六'];
+const DAYS_SHORT = ['周日','周一','周二','周三','周四','周五','周六'];
 const MNAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 const PALETTE = ['#2563a8','#6d4fc4','#2e7d32','#0e7c61','#b05c1a','#c62828','#c2185b','#00838f','#558b2f','#6d4c41','#1565c0','#4527a0'];
 
 const USER = new URLSearchParams(window.location.search).get('user') || 'default';
 const S_KEY = 'subjects_' + USER;
-const Q_KEY = 'quotas_'   + USER;
+const Q_KEY = 'quotas_' + USER;
 
+// schedule: [{day:1, time:'16:00'}, ...]  day: 0=Sun…6=Sat
 const DEFAULT_SUBJECTS = [
-  {name:'钢琴',   emoji:'🎹', color:'#2563a8', total:20},
-  {name:'国际象棋', emoji:'♟',  color:'#6d4fc4', total:24},
-  {name:'数学',   emoji:'📐', color:'#2e7d32', total:16},
-  {name:'游泳',   emoji:'🏊', color:'#0e7c61', total:20},
-  {name:'围棋',   emoji:'⚫', color:'#b05c1a', total:20},
+  {name:'钢琴',    emoji:'🎹', color:'#2563a8', total:20, schedule:[]},
+  {name:'国际象棋', emoji:'♟',  color:'#6d4fc4', total:24, schedule:[]},
+  {name:'数学',    emoji:'📐', color:'#2e7d32', total:16, schedule:[]},
+  {name:'游泳',    emoji:'🏊', color:'#0e7c61', total:20, schedule:[]},
+  {name:'围棋',    emoji:'⚫', color:'#b05c1a', total:20, schedule:[]},
 ];
 
 let subjects = JSON.parse(localStorage.getItem(S_KEY) || 'null') || DEFAULT_SUBJECTS;
-let quotas   = JSON.parse(localStorage.getItem(Q_KEY) || '{}');
+// Ensure schedule field exists
+subjects.forEach(s => { if (!s.schedule) s.schedule = []; });
+let quotas = JSON.parse(localStorage.getItem(Q_KEY) || '{}');
 subjects.forEach(s => { if (!quotas[s.name]) quotas[s.name] = {total:s.total, extra:0}; });
 
 let allRecords = [];
 let cy = new Date().getFullYear(), cm = new Date().getMonth()+1;
-let filter = 'all', editSub = null, editSubjectIdx = null, selectedColor = PALETTE[0];
+let filter = 'all', editSub = null, editSubjectIdx = null;
+let selectedColor = PALETTE[0], selectedSubject = null;
 
 function saveSubjects(){ localStorage.setItem(S_KEY, JSON.stringify(subjects)); }
 function saveQuotas(){   localStorage.setItem(Q_KEY, JSON.stringify(quotas)); }
 
-// API
-function apiFetch(params){ return fetch(API+'?'+new URLSearchParams(params),{method:'GET',redirect:'follow',mode:'cors'}).then(r=>r.json()); }
-function apiJsonp(params){
+// ---- API ----
+function apiFetch(p){ return fetch(API+'?'+new URLSearchParams(p),{method:'GET',redirect:'follow',mode:'cors'}).then(r=>r.json()); }
+function apiJsonp(p){
   return new Promise((res,rej)=>{
     const cb='cb_'+Date.now(), s=document.createElement('script');
-    const t=setTimeout(()=>{rej(new Error('timeout'));s.remove();delete window[cb];},10000);
+    const t=setTimeout(()=>{rej(new Error('t'));s.remove();delete window[cb];},10000);
     window[cb]=d=>{clearTimeout(t);res(d);s.remove();delete window[cb];};
-    s.onerror=()=>{clearTimeout(t);rej(new Error('err'));delete window[cb];};
-    s.src=API+'?'+new URLSearchParams({...params,callback:cb});
+    s.onerror=()=>{clearTimeout(t);rej(new Error('e'));delete window[cb];};
+    s.src=API+'?'+new URLSearchParams({...p,callback:cb});
     document.head.appendChild(s);
   });
 }
@@ -256,7 +325,7 @@ async function apiCall(p){ try{return await apiFetch(p);}catch(e){return await a
 
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 
-// Nav
+// ---- Nav ----
 function switchPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('on'));
@@ -265,7 +334,27 @@ function switchPage(name){
   if(name==='settings') renderSettings();
 }
 
-// Home
+// ---- Today banner ----
+function renderTodayBanner(){
+  const today = new Date();
+  const todayDay = today.getDay(); // 0=Sun
+  const todaysSubjects = subjects.filter(s => s.schedule && s.schedule.some(sc => sc.day === todayDay));
+  const banner = document.getElementById('todayBanner');
+  if(!todaysSubjects.length){ banner.classList.remove('show'); return; }
+  banner.style.background = 'transparent';
+  const pillsHtml = todaysSubjects.map(s => {
+    const times = s.schedule.filter(sc=>sc.day===todayDay).map(sc=>sc.time).filter(Boolean);
+    const label = times.length ? `${s.emoji} ${s.name} ${times.join('/')}` : `${s.emoji} ${s.name}`;
+    return `<button class="today-pill" style="background:${s.color}" onclick="openAddForSubject('${s.name}')">${label} ＋</button>`;
+  }).join('');
+  document.getElementById('todayClasses').innerHTML = pillsHtml;
+  banner.style.background = '#fff';
+  banner.style.border = '1px solid var(--border)';
+  banner.style.borderRadius = 'var(--radius-sm)';
+  banner.classList.add('show');
+}
+
+// ---- Home render ----
 function changeMonth(d){ cm+=d; if(cm>12){cm=1;cy++;} if(cm<1){cm=12;cy--;} render(); }
 
 function renderTabs(){
@@ -295,11 +384,40 @@ function renderQuotas(){
   }).join('');
 }
 
+function renderStats(){
+  const mr=monthRecs();
+  const block=document.getElementById('statsBlock');
+  if(!subjects.length){block.innerHTML='';return;}
+  const rows=subjects.map(s=>{
+    const done =mr.filter(r=>r.subject===s.name&&r.status==='已完成').length;
+    const leave=mr.filter(r=>r.subject===s.name&&r.status==='请假').length;
+    const soon =mr.filter(r=>r.subject===s.name&&r.status==='待上课').length;
+    if(done+leave+soon===0) return null;
+    return {s,done,leave,soon};
+  }).filter(Boolean);
+  if(!rows.length){block.innerHTML='';return;}
+  const tDone =rows.reduce((a,r)=>a+r.done,0);
+  const tLeave=rows.reduce((a,r)=>a+r.leave,0);
+  const tSoon =rows.reduce((a,r)=>a+r.soon,0);
+  block.innerHTML=`<div class="stats-table">
+    <div class="stats-table-head"><span>科目</span><span style="text-align:center">已上课</span><span style="text-align:center">请假</span><span style="text-align:center">待上课</span></div>
+    ${rows.map(({s,done,leave,soon})=>`<div class="stats-table-row">
+      <div class="stats-sub"><div class="stats-dot" style="background:${s.color}"></div>${s.name}</div>
+      <div class="stats-cell done">${done||'–'}</div>
+      <div class="stats-cell leave">${leave||'–'}</div>
+      <div class="stats-cell soon">${soon||'–'}</div>
+    </div>`).join('')}
+    <div class="stats-total-row">
+      <div class="stats-total-label">合计</div>
+      <div class="stats-total-cell done">${tDone}</div>
+      <div class="stats-total-cell leave">${tLeave}</div>
+      <div class="stats-total-cell soon">${tSoon}</div>
+    </div>
+  </div>`;
+}
+
 function renderList(){
   const mr=monthRecs();
-  document.getElementById('sDone').textContent  = mr.filter(r=>r.status==='已完成').length;
-  document.getElementById('sLeave').textContent = mr.filter(r=>r.status==='请假').length;
-  document.getElementById('sSoon').textContent  = mr.filter(r=>r.status==='待上课').length;
   const shown=(filter==='all'?mr:mr.filter(r=>r.subject===filter)).sort((a,b)=>b.date.localeCompare(a.date));
   const list=document.getElementById('recList');
   if(!shown.length){list.innerHTML='<div class="empty">本月暂无记录</div>';return;}
@@ -307,7 +425,7 @@ function renderList(){
   const col=name=>{const s=subjects.find(x=>x.name===name);return s?s.color:'#999';};
   list.innerHTML='<div class="records-list">'+shown.map(r=>{
     const d=new Date(r.date);
-    const ds=(d.getMonth()+1)+'月'+d.getDate()+'日 '+DAYS[d.getDay()];
+    const ds=(d.getMonth()+1)+'月'+d.getDate()+'日 '+DAYS_SHORT[d.getDay()];
     return `<div class="rec-card">
       <div class="rec-dot" style="background:${col(r.subject)}"></div>
       <div class="rec-main">
@@ -322,7 +440,7 @@ function renderList(){
 
 function render(){
   document.getElementById('monthLabel').textContent=cy+'年'+MNAMES[cm-1];
-  renderTabs(); renderQuotas(); renderList();
+  renderTabs(); renderQuotas(); renderStats(); renderList(); renderTodayBanner();
 }
 
 async function loadAll(){
@@ -336,38 +454,69 @@ async function loadAll(){
   }
 }
 
-// Add record
-function openAdd(){
+// ---- Subject picker ----
+function renderSubPicker(){
+  const picker = document.getElementById('subPicker');
+  // adjust grid cols
+  picker.style.gridTemplateColumns = subjects.length <= 2 ? '1fr' : 'repeat(2,1fr)';
+  picker.innerHTML = subjects.map(s=>`
+    <button class="sub-pick-btn${selectedSubject===s.name?' on':''}"
+      style="background:${s.color}"
+      onclick="pickSubject('${s.name}')">
+      <span style="font-size:20px">${s.emoji}</span>${s.name}
+    </button>`).join('');
+}
+
+function pickSubject(name){
+  selectedSubject = name;
+  renderSubPicker();
+}
+
+// ---- Add record ----
+function openAdd(presetSubject){
   const pad=n=>String(n).padStart(2,'0');
-  document.getElementById('fDate').value=`${cy}-${pad(cm)}-${pad(new Date().getDate())}`;
+  const today=new Date();
+  document.getElementById('fDate').value=`${cy}-${pad(cm)}-${pad(today.getDate())}`;
   document.getElementById('fNote').value='';
-  document.getElementById('fSub').innerHTML=subjects.map(s=>`<option value="${s.name}">${s.emoji} ${s.name}</option>`).join('');
+  selectedSubject = presetSubject || (subjects.length ? subjects[0].name : null);
+  renderSubPicker();
   document.getElementById('addOverlay').classList.add('show');
 }
+
+function openAddForSubject(name){
+  openAdd(name);
+}
+
 function closeAdd(){ document.getElementById('addOverlay').classList.remove('show'); }
 
 async function saveAdd(){
   const date=document.getElementById('fDate').value;
   if(!date){showToast('请选择日期');return;}
+  if(!selectedSubject){showToast('请选择科目');return;}
   const btn=document.getElementById('saveBtn');
   btn.textContent='保存中…';btn.disabled=true;
   try{
-    const sub=document.getElementById('fSub').value;
     const status=document.getElementById('fStatus').value;
     const note=document.getElementById('fNote').value;
-    const res=await apiCall({action:'add',date,user:USER,subject:sub,status,note});
-    if(res.ok){ allRecords.push({id:String(res.id),date,subject:sub,status,note}); closeAdd();render();showToast('已添加'); }
+    const res=await apiCall({action:'add',date,user:USER,subject:selectedSubject,status,note});
+    if(res.ok){
+      allRecords.push({id:String(res.id),date,subject:selectedSubject,status,note});
+      closeAdd();render();showToast('已添加');
+    }
   }catch(e){showToast('保存失败，请重试');}
   btn.textContent='保存';btn.disabled=false;
 }
 
 async function delRec(id){
   if(!confirm('确认删除这条记录？'))return;
-  try{ await apiCall({action:'delete',id,user:USER}); allRecords=allRecords.filter(r=>String(r.id)!==String(id)); render();showToast('已删除'); }
-  catch(e){showToast('删除失败');}
+  try{
+    await apiCall({action:'delete',id,user:USER});
+    allRecords=allRecords.filter(r=>String(r.id)!==String(id));
+    render();showToast('已删除');
+  }catch(e){showToast('删除失败');}
 }
 
-// Quota
+// ---- Quota ----
 function openQuota(name){
   editSub=name;
   const q=quotas[name]||{total:20,extra:0};
@@ -383,44 +532,75 @@ function saveQuota(){
   saveQuotas();closeQuota();renderQuotas();showToast('已保存');
 }
 
-// Settings
+// ---- Settings ----
+const DAY_LABELS=['日','一','二','三','四','五','六'];
 function renderSettings(){
-  document.getElementById('subjectList').innerHTML=subjects.map((s,i)=>`
-    <div class="subject-item">
-      <div class="subject-dot" style="background:${s.color}"></div>
-      <div class="subject-info">
-        <div class="subject-name">${s.emoji} ${s.name}</div>
-        <div class="subject-meta">课时包 ${(quotas[s.name]||{}).total||s.total} 节 · 已上 ${usedAll(s.name)} 节</div>
+  document.getElementById('subjectList').innerHTML=subjects.map((s,i)=>{
+    const scheds = (s.schedule||[]).map(sc=>`<span class="schedule-pill" style="background:${s.color}">${DAYS_SHORT[sc.day]} ${sc.time||''}</span>`).join('');
+    return `<div class="subject-item">
+      <div class="subject-item-top">
+        <div class="subject-dot" style="background:${s.color}"></div>
+        <div class="subject-info">
+          <div class="subject-name">${s.emoji} ${s.name}</div>
+          <div class="subject-meta">课时包 ${(quotas[s.name]||{}).total||s.total} 节 · 已上 ${usedAll(s.name)} 节</div>
+        </div>
+        <div class="subject-actions">
+          <button class="icon-btn" onclick="openEditSubject(${i})">编辑</button>
+          <button class="icon-btn danger" onclick="deleteSubject(${i})">删除</button>
+        </div>
       </div>
-      <div class="subject-actions">
-        <button class="icon-btn" onclick="openEditSubject(${i})">编辑</button>
-        <button class="icon-btn danger" onclick="deleteSubject(${i})">删除</button>
-      </div>
-    </div>`).join('');
+      ${scheds ? `<div class="schedule-pills">${scheds}</div>` : ''}
+    </div>`;
+  }).join('');
 }
 
+// color grid
 function renderColorGrid(sel){
   document.getElementById('colorGrid').innerHTML=PALETTE.map(c=>`<div class="color-dot${c===sel?' on':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
 }
 function pickColor(c){ selectedColor=c; renderColorGrid(c); }
 
+// schedule rows
+let editScheduleRows = [];
+function renderScheduleRows(){
+  document.getElementById('scheduleList').innerHTML = editScheduleRows.map((row,i)=>`
+    <div class="schedule-row">
+      <select onchange="editScheduleRows[${i}].day=parseInt(this.value)">
+        ${DAY_LABELS.map((d,di)=>`<option value="${di}"${row.day===di?' selected':''}>${DAYS_SHORT[di]}</option>`).join('')}
+      </select>
+      <input type="time" value="${row.time||''}" style="flex:1;padding:6px 8px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:inherit;outline:none;" onchange="editScheduleRows[${i}].time=this.value">
+      <button class="rm-btn" onclick="removeScheduleRow(${i})">×</button>
+    </div>`).join('');
+}
+function addScheduleRow(){
+  editScheduleRows.push({day:1,time:'16:00'});
+  renderScheduleRows();
+}
+function removeScheduleRow(i){
+  editScheduleRows.splice(i,1);
+  renderScheduleRows();
+}
+
 function openAddSubject(){
-  editSubjectIdx=null; selectedColor=PALETTE[0];
+  editSubjectIdx=null; selectedColor=PALETTE[0]; editScheduleRows=[];
   document.getElementById('subjectSheetTitle').textContent='添加科目';
   document.getElementById('sName').value='';
   document.getElementById('sEmoji').value='';
   document.getElementById('sTotal').value=20;
   renderColorGrid(selectedColor);
+  renderScheduleRows();
   document.getElementById('subjectOverlay').classList.add('show');
 }
 
 function openEditSubject(i){
   editSubjectIdx=i; const s=subjects[i]; selectedColor=s.color;
+  editScheduleRows = (s.schedule||[]).map(sc=>({...sc}));
   document.getElementById('subjectSheetTitle').textContent='编辑科目';
   document.getElementById('sName').value=s.name;
   document.getElementById('sEmoji').value=s.emoji;
   document.getElementById('sTotal').value=(quotas[s.name]||{}).total||s.total;
   renderColorGrid(selectedColor);
+  renderScheduleRows();
   document.getElementById('subjectOverlay').classList.add('show');
 }
 
@@ -431,14 +611,15 @@ function saveSubject(){
   const emoji=document.getElementById('sEmoji').value.trim()||'📚';
   const total=parseInt(document.getElementById('sTotal').value)||20;
   if(!name){showToast('请输入科目名称');return;}
+  const schedule=editScheduleRows.filter(r=>r.day!==undefined);
   if(editSubjectIdx!==null){
     const old=subjects[editSubjectIdx].name;
-    subjects[editSubjectIdx]={name,emoji,color:selectedColor,total};
+    subjects[editSubjectIdx]={name,emoji,color:selectedColor,total,schedule};
     if(old!==name){ quotas[name]=quotas[old]||{total,extra:0}; delete quotas[old]; }
     else{ quotas[name]={...(quotas[name]||{}),total}; }
   } else {
     if(subjects.find(s=>s.name===name)){showToast('科目名称已存在');return;}
-    subjects.push({name,emoji,color:selectedColor,total});
+    subjects.push({name,emoji,color:selectedColor,total,schedule});
     quotas[name]={total,extra:0};
   }
   saveSubjects();saveQuotas();
@@ -453,6 +634,7 @@ function deleteSubject(i){
   subjects.splice(i,1); saveSubjects(); renderSettings(); render(); showToast('已删除');
 }
 
+// Overlay tap-outside
 ['addOverlay','quotaOverlay','subjectOverlay'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show');});
 });
