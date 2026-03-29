@@ -63,6 +63,37 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 .qbar-fill{height:100%;border-radius:2px;}
 .qcard-detail{font-size:10px;color:var(--text3);}
 
+/* View toggle */
+.view-toggle{display:flex;gap:6px;margin-top:10px;}
+.vtab{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text2);font-family:inherit;}
+.vtab.on{background:var(--text);color:#fff;border-color:var(--text);}
+
+/* Calendar */
+.cal-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-dow{text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:8px 0;}
+.cal-dow:first-child{color:var(--red);}
+.cal-dow:last-child{color:#2563a8;}
+.cal-cell{min-height:52px;padding:4px 4px 3px;border-top:1px solid var(--border);cursor:pointer;position:relative;}
+.cal-cell:nth-child(7n+1) .cal-day{color:var(--red);}
+.cal-cell:nth-child(7n) .cal-day{color:#2563a8;}
+.cal-cell.other-month{background:var(--bg);}
+.cal-cell.today{background:#fffef5;}
+.cal-cell.today .cal-day{font-weight:700;color:var(--text);}
+.cal-day{font-size:12px;color:var(--text2);margin-bottom:3px;line-height:1;}
+.cal-dots{display:flex;flex-wrap:wrap;gap:2px;}
+.cal-dot{width:7px;height:7px;border-radius:50%;}
+.cal-cell:active{background:var(--surface2);}
+
+/* Day detail sheet */
+.day-detail-date{font-size:13px;color:var(--text2);margin-bottom:12px;}
+.day-rec{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.day-rec:last-child{border-bottom:none;}
+.day-rec-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.day-rec-info{flex:1;}
+.day-rec-sub{font-size:14px;font-weight:500;}
+.day-rec-note{font-size:12px;color:var(--text3);margin-top:1px;}
+
 /* Per-subject stats */
 .stats-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;width:100%;}
 .stats-table-head{display:grid;grid-template-columns:1fr repeat(3,60px);padding:6px 12px;background:var(--surface2);font-size:11px;font-weight:700;color:var(--text3);}
@@ -183,6 +214,10 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
       </div>
     </div>
     <div class="subject-tabs" id="subjectTabs"></div>
+    <div class="view-toggle">
+      <button class="vtab on" id="vtab-list" onclick="setView('list')">📋 列表</button>
+      <button class="vtab" id="vtab-cal" onclick="setView('cal')">📅 日历</button>
+    </div>
   </div>
 
   <!-- Today banner -->
@@ -194,6 +229,7 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
   <div class="main">
     <div class="quota-grid" id="quotaGrid"></div>
     <div id="statsBlock" style="margin-bottom:14px;"></div>
+    <div id="calView" style="display:none;margin-bottom:14px;"></div>
     <div id="recList"><div class="loading">加载中...</div></div>
   </div>
   <button class="fab" onclick="openAdd()">＋</button>
@@ -270,6 +306,20 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
     <div class="sheet-actions">
       <button class="btn-cancel" onclick="closeSubject()">取消</button>
       <button class="btn-save" onclick="saveSubject()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DAY DETAIL SHEET ===== -->
+<div class="overlay" id="dayOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="dayTitle"></div>
+    <div class="day-detail-date" id="dayDate"></div>
+    <div id="dayRecs"></div>
+    <div class="sheet-actions" style="margin-top:16px;">
+      <button class="btn-cancel" onclick="closeDayOverlay()">关闭</button>
+      <button class="btn-save" onclick="openAddFromDay()">＋ 添加记录</button>
     </div>
   </div>
 </div>
@@ -440,7 +490,8 @@ function renderList(){
 
 function render(){
   document.getElementById('monthLabel').textContent=cy+'年'+MNAMES[cm-1];
-  renderTabs(); renderQuotas(); renderStats(); renderList(); renderTodayBanner();
+  renderTabs(); renderQuotas(); renderStats(); renderTodayBanner();
+  if(currentView==='cal') renderCalendar(); else renderList();
 }
 
 async function loadAll(){
@@ -634,8 +685,87 @@ function deleteSubject(i){
   subjects.splice(i,1); saveSubjects(); renderSettings(); render(); showToast('已删除');
 }
 
+// ---- View switcher ----
+let currentView = 'list';
+let selectedDayDate = null;
+
+function setView(v){
+  currentView = v;
+  document.getElementById('vtab-list').classList.toggle('on', v==='list');
+  document.getElementById('vtab-cal').classList.toggle('on', v==='cal');
+  document.getElementById('recList').style.display = v==='list' ? '' : 'none';
+  document.getElementById('calView').style.display = v==='cal' ? '' : 'none';
+  if(v==='cal') renderCalendar(); else renderList();
+}
+
+// ---- Calendar ----
+function renderCalendar(){
+  const calEl = document.getElementById('calView');
+  const firstDay = new Date(cy, cm-1, 1);
+  const lastDay  = new Date(cy, cm, 0);
+  const startDow = firstDay.getDay();
+  const totalDays = lastDay.getDate();
+  const today = new Date();
+  const todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  const recMap = {};
+  allRecords.forEach(r=>{ if(!recMap[r.date])recMap[r.date]={}; if(!recMap[r.date][r.subject])recMap[r.date][r.subject]=[]; recMap[r.date][r.subject].push(r); });
+  const col=name=>{const s=subjects.find(x=>x.name===name);return s?s.color:'#999';};
+  const dowLabels=['日','一','二','三','四','五','六'];
+  const headers=dowLabels.map(d=>'<div class="cal-dow">'+d+'</div>').join('');
+  let cells='';
+  for(let i=0;i<startDow;i++) cells+='<div class="cal-cell other-month"></div>';
+  for(let d=1;d<=totalDays;d++){
+    const dateStr=cy+'-'+String(cm).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dayRecs=recMap[dateStr]||{};
+    const isToday=dateStr===todayStr;
+    const dotSubjects=filter==='all'?Object.keys(dayRecs):(dayRecs[filter]?[filter]:[]);
+    const dots=dotSubjects.slice(0,5).map(name=>'<div class="cal-dot" style="background:'+col(name)+'"></div>').join('');
+    cells+='<div class="cal-cell'+(isToday?' today':'')+'" onclick="openDayDetail(\''+dateStr+'\')"><div class="cal-day">'+d+'</div><div class="cal-dots">'+dots+'</div></div>';
+  }
+  const trailing=(startDow+totalDays)%7===0?0:7-(startDow+totalDays)%7;
+  for(let i=0;i<trailing;i++) cells+='<div class="cal-cell other-month"></div>';
+  calEl.innerHTML='<div class="cal-wrap"><div class="cal-grid">'+headers+cells+'</div></div>';
+}
+
+// ---- Day detail ----
+function openDayDetail(dateStr){
+  selectedDayDate=dateStr;
+  const d=new Date(dateStr);
+  const label=(d.getMonth()+1)+'月'+d.getDate()+'日 '+DAYS_SHORT[d.getDay()];
+  document.getElementById('dayTitle').textContent=label;
+  const dayRecs=allRecords.filter(r=>r.date===dateStr);
+  const col=name=>{const s=subjects.find(x=>x.name===name);return s?s.color:'#999';};
+  const sc={'已完成':'done','请假':'leave','待上课':'soon'};
+  if(!dayRecs.length){
+    document.getElementById('dayRecs').innerHTML='<div style="padding:1rem 0;color:var(--text3);font-size:13px;text-align:center;">暂无记录，点下方按钮添加</div>';
+  } else {
+    document.getElementById('dayRecs').innerHTML=dayRecs.map(r=>`<div class="day-rec"><div class="day-rec-dot" style="background:${col(r.subject)}"></div><div class="day-rec-info"><div class="day-rec-sub">${r.subject}</div>${r.note?'<div class="day-rec-note">'+r.note+'</div>':''}</div><span class="badge ${sc[r.status]||'soon'}">${r.status}</span><button class="rec-del" onclick="delRecFromDay(\'${r.id}\',\'${dateStr}\')">×</button></div>`).join('');
+  }
+  document.getElementById('dayOverlay').classList.add('show');
+}
+
+function closeDayOverlay(){ document.getElementById('dayOverlay').classList.remove('show'); }
+
+function openAddFromDay(){
+  closeDayOverlay();
+  document.getElementById('fDate').value=selectedDayDate;
+  document.getElementById('fNote').value='';
+  selectedSubject=subjects.length?subjects[0].name:null;
+  renderSubPicker();
+  document.getElementById('addOverlay').classList.add('show');
+}
+
+async function delRecFromDay(id,dateStr){
+  if(!confirm('确认删除这条记录？'))return;
+  try{
+    await apiCall({action:'delete',id,user:USER});
+    allRecords=allRecords.filter(r=>String(r.id)!==String(id));
+    render(); openDayDetail(dateStr); showToast('已删除');
+  }catch(e){showToast('删除失败');}
+}
+
 // Overlay tap-outside
-['addOverlay','quotaOverlay','subjectOverlay'].forEach(id=>{
+['addOverlay','quotaOverlay','subjectOverlay','dayOverlay'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show');});
 });
 
