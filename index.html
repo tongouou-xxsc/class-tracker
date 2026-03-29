@@ -498,7 +498,12 @@ async function loadAll(){
   document.getElementById('recList').innerHTML='<div class="loading">加载中...</div>';
   try{
     const res=await apiCall({action:'getAll',user:USER});
-    allRecords=(res.records||[]).filter(r=>r.id&&r.date&&r.subject);
+    allRecords=(res.records||[]).filter(r=>r.id&&r.date&&r.subject).map(r=>{
+      // Normalize date: extract YYYY-MM-DD portion only, ignore time/timezone
+      const m = String(r.date).match(/^(\d{4}-\d{2}-\d{2})/);
+      if(m) r.date = m[1];
+      return r;
+    });
     render();
   }catch(e){
     document.getElementById('recList').innerHTML='<div class="empty">加载失败 — 请确认 Apps Script 已部署</div>';
