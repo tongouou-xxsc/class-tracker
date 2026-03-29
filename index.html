@@ -499,9 +499,17 @@ async function loadAll(){
   try{
     const res=await apiCall({action:'getAll',user:USER});
     allRecords=(res.records||[]).filter(r=>r.id&&r.date&&r.subject).map(r=>{
-      // Normalize date: extract YYYY-MM-DD portion only, ignore time/timezone
-      const m = String(r.date).match(/^(\d{4}-\d{2}-\d{2})/);
-      if(m) r.date = m[1];
+      const str = String(r.date);
+      if(str.includes('T')){
+        // ISO with time: convert UTC to CST (+8) before extracting date
+        const d = new Date(str);
+        const cst = new Date(d.getTime() + 8*60*60*1000);
+        r.date = cst.getUTCFullYear()+'-'+String(cst.getUTCMonth()+1).padStart(2,'0')+'-'+String(cst.getUTCDate()).padStart(2,'0');
+      } else {
+        // Already YYYY-MM-DD
+        const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
+        if(m) r.date = m[1];
+      }
       return r;
     });
     render();
